@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KG Study Tool Demo Web
 
-## Getting Started
+Demo-ready Next.js web app for the KG Study Tool experience:
 
-First, run the development server:
+- Upload study materials
+- Trigger extraction
+- Explore an interactive knowledge graph
+- Use filters/search/details and Study Path
+- Export PNG snapshots
+
+The app is designed to be **offline-demoable**. The browser only calls Next.js `/api/*` routes. Those routes proxy to `API_BASE_URL`, and the included `stub-api/` service provides a deterministic FastAPI implementation of the API contract.
+
+## Stack
+
+- Next.js App Router + TypeScript (strict)
+- Tailwind v4
+- Zustand
+- react-force-graph-2d
+- FastAPI stub API
+- Docker Compose (`web` + `api`)
+- Playwright smoke tests
+
+## Quick Start (Local)
+
+1. Install dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Start the stub API (terminal A)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd stub-api
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Start the web app (terminal B)
 
-## Learn More
+```bash
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Open `http://localhost:3000`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Quick Start (Docker)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+docker compose up --build
+```
 
-## Deploy on Vercel
+Then open:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Web: `http://localhost:3000`
+- API docs: `http://localhost:8000/docs`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Environment Variables
+
+Copy `.env.example` to `.env.local` for local development.
+
+```env
+API_BASE_URL=http://localhost:8000
+```
+
+Docker compose uses:
+
+```env
+API_BASE_URL=http://api:8000
+```
+
+## API Contract (Web-facing)
+
+The browser talks only to these Next routes:
+
+- `POST /api/upload`
+- `POST /api/extract`
+- `GET /api/graph/:graphId`
+- `GET /api/node/:graphId/:nodeId`
+- `GET /api/search/:graphId?q=...`
+- `GET /api/health`
+- `GET /api/demo/graph`
+
+Route handlers proxy to the external API base URL server-side. Multipart upload is forwarded via `request.formData()` without manually setting `Content-Type`.
+
+## Demo Script (Judge Flow)
+
+1. Open landing page `/`.
+2. Click **Upload materials** to enter `/app`.
+3. Click **Load demo graph** (works even if API is down).
+4. Use search for `Photosynthesis`.
+5. Show details panel + Study Path panel.
+6. Toggle filters (entity/relationship types).
+7. Click **Export PNG**.
+
+Optional API-backed flow:
+
+1. Upload a `.txt`/`.pdf`/`.pptx`/`.docx` file.
+2. Click **Build Knowledge Graph**.
+3. Observe queued/processing/complete extraction status.
+
+## Offline Mode
+
+If the API is unreachable:
+
+- `/api/health` marks API unavailable.
+- `/app` shows offline banner.
+- Demo graph remains fully usable via `/api/demo/graph` and bundled JSON.
+
+## Playwright Smoke Tests
+
+Install browsers once:
+
+```bash
+npx playwright install
+```
+
+Run tests:
+
+```bash
+npx playwright test
+```
+
+The smoke suite uses stable `data-testid` selectors and avoids direct canvas coordinate clicks.
+
+## Switching to a Real API Later
+
+1. Keep browser requests pointed at Next `/api/*` routes.
+2. Set `API_BASE_URL` to your real backend.
+3. Ensure the backend contract matches the payload types in `src/lib/types.ts`.
+4. Keep `stub-api/` for local demos and CI smoke workflows.

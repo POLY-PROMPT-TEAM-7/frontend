@@ -52,11 +52,12 @@
     {"id": "e27", "source": "n3", "target": "n2", "relationship_type": "part_of", "confidence": 0.92},
     {"id": "e28", "source": "n15", "target": "n16", "relationship_type": "related_to", "confidence": 0.75},
     {"id": "e29", "source": "n17", "target": "n20", "relationship_type": "related_to", "confidence": 0.79},
-    {"id": "e30", "source": "n18", "target": "n20", "relationship_type": "related_to", "confidence": 0.8}
+    {"id": "e30", "source": "n18", "target": "n20", "relationship_type": "related_to", "confidence": 0.8},
+    {"id": "e31", "source": "n13", "target": "n20", "relationship_type": "prerequisite_of", "confidence": 0.93}
   ],
   "stats": {
     "node_count": 20,
-    "edge_count": 30,
+    "edge_count": 31,
     "entity_type_count": {
       "Concept": 1,
       "Process": 6,
@@ -65,7 +66,7 @@
       "Outcome": 1
     },
     "relationship_type_count": {
-      "prerequisite_of": 1,
+      "prerequisite_of": 2,
       "part_of": 11,
       "enables": 7,
       "causes": 8,

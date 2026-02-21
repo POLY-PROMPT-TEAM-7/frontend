@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { LandingGraphPreview } from "@/components/LandingGraphPreview";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -17,20 +18,15 @@ export default function Home() {
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link href="/app">
-                <Button>Open Demo App</Button>
+                <Button>Upload materials</Button>
               </Link>
               <Link href="/about">
                 <Button variant="secondary">About & Ethics</Button>
               </Link>
             </div>
           </Card>
-          <Card title="Wave 1 Foundation" subtitle="UI shell and backend contract setup">
-            <ul className="space-y-2 text-sm text-[var(--color-text-muted)]">
-              <li>Strict TypeScript API + graph models</li>
-              <li>Zustand app state machine</li>
-              <li>Proxy-ready route architecture</li>
-              <li>FastAPI deterministic stub + docker compose</li>
-            </ul>
+          <Card title="Live Preview" subtitle="Connected learning structure at a glance">
+            <LandingGraphPreview />
           </Card>
         </section>
       </div>
