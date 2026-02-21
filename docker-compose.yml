@@ -1,0 +1,19 @@
+services:
+  api:
+    build:
+      context: ./stub-api
+    container_name: kg-study-api
+    ports:
+      - "8000:8000"
+
+  web:
+    build:
+      context: .
+    container_name: kg-study-web
+    environment:
+      API_BASE_URL: http://api:8000
+      NODE_ENV: production
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"

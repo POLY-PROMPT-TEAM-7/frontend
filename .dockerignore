@@ -1,0 +1,14 @@
+.git
+.github
+.next
+.sisyphus
+.worktrees
+.logs
+node_modules
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+*.local
+coverage
