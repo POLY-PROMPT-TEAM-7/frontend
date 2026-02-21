@@ -158,6 +158,31 @@ export default function AppPage() {
 
   const detailsForPanel = selectedNodeId ? nodeDetails : null;
 
+  const popupNode = useMemo(() => {
+    if (!selectedNodeId) return null;
+    const node = detailsForPanel?.node ?? filteredGraph?.nodes.find((item) => item.id === selectedNodeId) ?? null;
+    return node;
+  }, [detailsForPanel?.node, filteredGraph, selectedNodeId]);
+
+  const nodePopup = useMemo(() => {
+    if (!popupNode) return null;
+    return (
+      <div
+        data-testid="node-popup"
+        className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-[0_10px_24px_rgba(17,24,39,0.12)]"
+      >
+        <p className="text-sm font-semibold text-[var(--color-text)]">{popupNode.name}</p>
+        <p className="mt-1 text-xs text-[var(--color-text-subtle)]">
+          {popupNode.entity_type}{" "}
+          {typeof popupNode.confidence === "number" ? `· ${popupNode.confidence.toFixed(2)}` : ""}
+        </p>
+        {popupNode.description ? (
+          <p className="mt-2 text-xs text-[var(--color-text-muted)]">{popupNode.description}</p>
+        ) : null}
+      </div>
+    );
+  }, [popupNode]);
+
   const onPollData = useCallback(
     (response: unknown) => {
       if (isGraphPayload(response)) {
@@ -334,6 +359,7 @@ export default function AppPage() {
           <GraphCanvas
             ref={graphRef}
             testId="graph-canvas"
+            popup={selectedNodeId ? nodePopup : null}
             payload={filteredGraph}
             selectedNodeId={selectedNodeId}
             selectedEdgeId={selectedEdgeId}
