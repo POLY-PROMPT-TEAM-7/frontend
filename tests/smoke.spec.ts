@@ -1,17 +1,28 @@
 import { expect, test } from "@playwright/test";
 
-test("demo flow loads graph, shows details and study path, exports png", async ({ page }) => {
+test("demo flow loads graph, shows details and study path as floating cards, exports png", async ({ page }) => {
   await page.goto("/app");
 
   await page.getByTestId("load-demo-btn").click();
   await expect(page.getByTestId("graph-canvas")).toBeVisible();
 
+  // Verify no right rail exists (details and study path moved to floating overlay)
+  const detailsPanel = page.getByTestId("details-panel");
+  const studyPathPanel = page.getByTestId("study-path-panel");
+  await expect(detailsPanel).not.toBeVisible();
+  await expect(studyPathPanel).not.toBeVisible();
+
+  // Search and select a node to trigger floating cards
   await page.getByTestId("search-input").fill("photosynthesis");
   await page.getByRole("button", { name: "Photosynthesis" }).click();
 
-  await expect(page.getByTestId("node-popup")).toContainText("Photosynthesis");
-  await expect(page.getByTestId("details-panel")).toContainText("Photosynthesis");
-  await expect(page.getByTestId("study-path-panel")).toContainText("Light Reactions");
+  // Verify floating cards appear inside graph canvas
+  const graphCanvas = page.getByTestId("graph-canvas");
+  await expect(graphCanvas.getByTestId("details-panel")).toContainText("Photosynthesis");
+  await expect(graphCanvas.getByTestId("study-path-panel")).toContainText("Light Reactions");
+
+  // Verify close button exists in floating overlay
+  await expect(page.getByTestId("close-details-btn")).toBeVisible();
 
   const exportButton = page.getByTestId("export-png-btn");
   await expect(exportButton).toBeEnabled({ timeout: 10000 });
@@ -53,18 +64,4 @@ test("mobile layout stays within viewport and core controls remain visible", asy
   });
 
   expect(hasHorizontalOverflow).toBeFalsy();
-});
-
-test("graph canvas is wider than right rail on desktop", async ({ page }) => {
-  await page.setViewportSize({ width: 1400, height: 900 });
-  await page.goto("/app");
-  await page.getByTestId("load-demo-btn").click();
-
-  const graphBox = await page.getByTestId("graph-canvas").boundingBox();
-  const detailsBox = await page.getByTestId("details-panel").boundingBox();
-
-  expect(graphBox && detailsBox).toBeTruthy();
-  if (!graphBox || !detailsBox) return;
-
-  expect(graphBox.width).toBeGreaterThan(detailsBox.width);
 });

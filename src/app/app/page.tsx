@@ -158,31 +158,6 @@ export default function AppPage() {
 
   const detailsForPanel = selectedNodeId ? nodeDetails : null;
 
-  const popupNode = useMemo(() => {
-    if (!selectedNodeId) return null;
-    const node = detailsForPanel?.node ?? filteredGraph?.nodes.find((item) => item.id === selectedNodeId) ?? null;
-    return node;
-  }, [detailsForPanel?.node, filteredGraph, selectedNodeId]);
-
-  const nodePopup = useMemo(() => {
-    if (!popupNode) return null;
-    return (
-      <div
-        data-testid="node-popup"
-        className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-[0_10px_24px_rgba(17,24,39,0.12)]"
-      >
-        <p className="text-sm font-semibold text-[var(--color-text)]">{popupNode.name}</p>
-        <p className="mt-1 text-xs text-[var(--color-text-subtle)]">
-          {popupNode.entity_type}{" "}
-          {typeof popupNode.confidence === "number" ? `· ${popupNode.confidence.toFixed(2)}` : ""}
-        </p>
-        {popupNode.description ? (
-          <p className="mt-2 text-xs text-[var(--color-text-muted)]">{popupNode.description}</p>
-        ) : null}
-      </div>
-    );
-  }, [popupNode]);
-
   const onPollData = useCallback(
     (response: unknown) => {
       if (isGraphPayload(response)) {
@@ -279,6 +254,65 @@ export default function AppPage() {
     [loadNodeDetails, setSelection],
   );
 
+  const floatingInspector = useMemo(() => {
+    if (!selectedNodeId) return null;
+    return (
+      <div className="pointer-events-auto absolute right-3 top-3 z-10 flex max-h-[calc(100%-24px)] w-[min(20rem,90%)] flex-col gap-3 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-[0_10px_24px_rgba(17,24,39,0.12)]">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-semibold text-[var(--color-text)]">Node Details</span>
+          <button
+            data-testid="close-details-btn"
+            onClick={() => {
+              setNodeDetails(null);
+              clearSelection();
+            }}
+            className="rounded-md p-1 text-[var(--color-text-subtle)] hover:bg-[var(--color-border)] hover:text-[var(--color-text)]"
+            aria-label="Close details"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <DetailsPanel
+          payload={filteredGraph}
+          nodeDetails={detailsForPanel}
+          selectedEdgeId={selectedEdgeId}
+          onFocusNode={handleSelectNode}
+        />
+        <StudyPathPanel
+          steps={studyPath.orderedNodes.map((node) => ({ id: node.id, name: node.name }))}
+          warning={studyPath.warning}
+          highlightPath={highlightPath}
+          onToggleHighlight={setHighlightPath}
+        />
+      </div>
+    );
+  }, [
+    selectedNodeId,
+    detailsForPanel,
+    filteredGraph,
+    selectedEdgeId,
+    handleSelectNode,
+    studyPath.orderedNodes,
+    studyPath.warning,
+    highlightPath,
+    setHighlightPath,
+    clearSelection,
+    setNodeDetails,
+  ]);
+
   const handleExport = useCallback(() => {
     if (!graphReady) {
       pushToast("Graph is not ready to export yet.", "warning");
@@ -344,7 +378,7 @@ export default function AppPage() {
         </div>
       </header>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,240px)_minmax(0,4fr)_minmax(0,220px)] 2xl:grid-cols-[minmax(0,260px)_minmax(0,4.8fr)_minmax(0,240px)]">
+      <section className="grid gap-4 lg:grid-cols-[1fr,2fr]">
         <div className="min-w-0 space-y-4">
           <UploadDropzone />
           <FileList />
@@ -359,7 +393,7 @@ export default function AppPage() {
           <GraphCanvas
             ref={graphRef}
             testId="graph-canvas"
-            popup={selectedNodeId ? nodePopup : null}
+            popup={floatingInspector}
             payload={filteredGraph}
             selectedNodeId={selectedNodeId}
             selectedEdgeId={selectedEdgeId}
@@ -375,21 +409,6 @@ export default function AppPage() {
               clearSelection();
             }}
             onGraphReady={undefined}
-          />
-        </div>
-
-        <div className="min-w-0 space-y-4">
-          <DetailsPanel
-            payload={filteredGraph}
-            nodeDetails={detailsForPanel}
-            selectedEdgeId={selectedEdgeId}
-            onFocusNode={handleSelectNode}
-          />
-          <StudyPathPanel
-            steps={studyPath.orderedNodes.map((node) => ({ id: node.id, name: node.name }))}
-            warning={studyPath.warning}
-            highlightPath={highlightPath}
-            onToggleHighlight={setHighlightPath}
           />
         </div>
       </section>
