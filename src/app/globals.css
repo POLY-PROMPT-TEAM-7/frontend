@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg: #f7f8f2;
+  --color-surface: #fffffb;
+  --color-surface-2: #eef1de;
+  --color-surface-3: #e3e8cc;
+  --color-text: #1f2a22;
+  --color-text-muted: #3e5144;
+  --color-text-subtle: #607468;
+  --color-border: #c9d3b6;
+  --color-accent: #2f6f45;
+  --color-accent-soft: #d8e8dd;
+  --color-accent-strong: #1c4f30;
+  --color-accent-ink: #f6fff8;
+  --color-success-soft: #d8efe4;
+  --color-success-strong: #1e6f46;
+  --color-warn-soft: #faecd1;
+  --color-warn-strong: #8a5b11;
+  --color-danger-soft: #f8dddd;
+  --color-danger-strong: #8a2323;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --font-sans: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-mono: "Menlo", "Monaco", "Cascadia Mono", monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background:
+    radial-gradient(65rem 35rem at 10% -10%, #eef3da 0%, transparent 60%),
+    radial-gradient(70rem 40rem at 110% -15%, #dce7d8 0%, transparent 52%),
+    var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+a {
+  color: inherit;
 }
