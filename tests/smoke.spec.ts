@@ -9,6 +9,7 @@ test("demo flow loads graph, shows details and study path, exports png", async (
   await page.getByTestId("search-input").fill("photosynthesis");
   await page.getByRole("button", { name: "Photosynthesis" }).click();
 
+  await expect(page.getByTestId("node-popup")).toContainText("Photosynthesis");
   await expect(page.getByTestId("details-panel")).toContainText("Photosynthesis");
   await expect(page.getByTestId("study-path-panel")).toContainText("Light Reactions");
 
