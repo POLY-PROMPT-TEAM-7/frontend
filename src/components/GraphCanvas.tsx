@@ -173,7 +173,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
     <div
       ref={containerRef}
       data-testid={testId}
-      className="h-[50vh] min-h-[320px] w-full overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] sm:h-[56vh] xl:h-[68vh]"
+      className="h-[50vh] min-h-[320px] w-full overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] sm:h-[56vh] xl:h-[72vh] 2xl:h-[74vh]"
     >
       <ForceGraph2D
         ref={fgRef}
