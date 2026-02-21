@@ -63,7 +63,12 @@ export function SearchBox({ graphId, graphMode, onSelect }: SearchBoxProps) {
     };
   }, [graphId, graphMode, query]);
 
-  const hasResults = useMemo(() => results.length > 0, [results.length]);
+  const visibleResults = useMemo(
+    () => (query.trim().length < 2 ? [] : results),
+    [query, results],
+  );
+
+  const hasResults = useMemo(() => visibleResults.length > 0, [visibleResults.length]);
 
   return (
     <div className="relative">
@@ -79,7 +84,7 @@ export function SearchBox({ graphId, graphMode, onSelect }: SearchBoxProps) {
 
       {hasResults ? (
         <div className="absolute z-30 mt-1 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg">
-          {results.map((item) => (
+          {visibleResults.map((item) => (
             <button
               key={item.id}
               type="button"

@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     ".worktrees/**",
     ".logs/**",
     ".sisyphus/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 

@@ -26,3 +26,18 @@ test("about page and landing route are available", async ({ page }) => {
   await expect(page).toHaveURL(/\/about$/);
   await expect(page.getByText("Responsible Use")).toBeVisible();
 });
+
+test("mobile layout stays within viewport and core controls remain visible", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/app");
+
+  await expect(page.getByTestId("load-demo-btn")).toBeVisible();
+  await expect(page.getByTestId("search-input")).toBeVisible();
+  await expect(page.getByTestId("upload-dropzone")).toBeVisible();
+
+  const hasHorizontalOverflow = await page.evaluate(() => {
+    return document.documentElement.scrollWidth > window.innerWidth + 1;
+  });
+
+  expect(hasHorizontalOverflow).toBeFalsy();
+});

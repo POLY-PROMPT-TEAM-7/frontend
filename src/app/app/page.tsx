@@ -53,8 +53,9 @@ export default function AppPage() {
 
   const [apiReachable, setApiReachable] = useState(true);
   const [nodeDetails, setNodeDetails] = useState<NodeDetailsPayload | null>(null);
-  const [pollGraphId, setPollGraphId] = useState<string | null>(null);
   const [highlightPath, setHighlightPath] = useState(true);
+  const pollGraphIdRef = useRef<string | null>(null);
+  const nodeDetailsRequestRef = useRef(0);
 
   useEffect(() => {
     let mounted = true;
@@ -81,7 +82,8 @@ export default function AppPage() {
   const graphReady = Boolean(filteredGraph && filteredGraph.nodes.length > 0);
 
   useEffect(() => {
-    if (!filteredGraph || !selectedNodeId) return;
+    if (!selectedNodeId) return;
+    if (!filteredGraph) return;
     const exists = filteredGraph.nodes.some((node) => node.id === selectedNodeId);
     if (!exists) {
       clearSelection();
@@ -120,6 +122,9 @@ export default function AppPage() {
 
   const loadNodeDetails = useCallback(
     async (nodeId: string) => {
+      const requestId = nodeDetailsRequestRef.current + 1;
+      nodeDetailsRequestRef.current = requestId;
+
       if (!filteredGraph) {
         setNodeDetails(null);
         return;
@@ -137,8 +142,13 @@ export default function AppPage() {
 
       try {
         const details = await getNodeDetails(graphId, nodeId);
-        setNodeDetails(details);
+        if (nodeDetailsRequestRef.current === requestId) {
+          setNodeDetails(details);
+        }
       } catch (error) {
+        if (nodeDetailsRequestRef.current !== requestId) {
+          return;
+        }
         const message = error instanceof Error ? error.message : "Failed loading node details";
         pushToast(message, "warning");
       }
@@ -154,7 +164,7 @@ export default function AppPage() {
         setGraphPayload(response, "api");
         setExtractStatus("complete", "Knowledge graph ready.");
         stopPollingFlag();
-        setPollGraphId(null);
+        pollGraphIdRef.current = null;
       } else {
         const status = (response as { status?: string; message?: string }).status;
         const message = (response as { message?: string }).message ?? "Extraction in progress";
@@ -163,7 +173,7 @@ export default function AppPage() {
         } else {
           setExtractStatus("error", message);
           stopPollingFlag();
-          setPollGraphId(null);
+          pollGraphIdRef.current = null;
         }
       }
     },
@@ -173,10 +183,10 @@ export default function AppPage() {
   const { start: startPoll, stop: stopPoll } = usePolling<unknown>({
     intervalMs: 1700,
     fetcher: async () => {
-      if (!pollGraphId) {
+      if (!pollGraphIdRef.current) {
         return { status: "error", message: "No graph id" };
       }
-      return getGraph(pollGraphId);
+      return getGraph(pollGraphIdRef.current);
     },
     onData: onPollData,
     shouldStop: (response) => {
@@ -187,9 +197,17 @@ export default function AppPage() {
     onError: (message) => {
       setExtractStatus("error", message);
       stopPollingFlag();
-      setPollGraphId(null);
+      pollGraphIdRef.current = null;
     },
   });
+
+  useEffect(() => {
+    return () => {
+      stopPoll();
+      stopPollingFlag();
+      pollGraphIdRef.current = null;
+    };
+  }, [stopPoll, stopPollingFlag]);
 
   const handleBuildGraph = useCallback(async () => {
     if (!uploadId) {
@@ -201,7 +219,7 @@ export default function AppPage() {
       setExtractStatus("queued", "Starting extraction...");
       const result = await extract(uploadId);
       setGraphId(result.graph_id);
-      setPollGraphId(result.graph_id);
+      pollGraphIdRef.current = result.graph_id;
       startPollingFlag();
       startPoll();
     } catch (error) {
@@ -214,7 +232,7 @@ export default function AppPage() {
   const handleCancelPolling = useCallback(() => {
     stopPoll();
     stopPollingFlag();
-    setPollGraphId(null);
+    pollGraphIdRef.current = null;
     setExtractStatus("idle", "Extraction cancelled.");
   }, [setExtractStatus, stopPoll, stopPollingFlag]);
 
@@ -301,8 +319,8 @@ export default function AppPage() {
         </div>
       </header>
 
-      <section className="grid gap-4 xl:grid-cols-[320px,1fr,340px]">
-        <div className="space-y-4">
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)]">
+        <div className="min-w-0 space-y-4">
           <UploadDropzone />
           <FileList />
           <Button data-testid="extract-btn" fullWidth onClick={() => void handleBuildGraph()} disabled={extractStatus === "processing" || extractStatus === "queued"}>
@@ -311,7 +329,7 @@ export default function AppPage() {
           <ExtractionStatus onCancel={handleCancelPolling} />
         </div>
 
-        <div className="space-y-3">
+        <div className="min-w-0 space-y-3">
           <StatsBar payload={filteredGraph} mode={graphMode} />
           <GraphCanvas
             ref={graphRef}
@@ -334,7 +352,7 @@ export default function AppPage() {
           />
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <DetailsPanel
             payload={filteredGraph}
             nodeDetails={detailsForPanel}
