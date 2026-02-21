@@ -281,7 +281,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
       />
 
       {popup ? (
-        <div className="pointer-events-none absolute left-3 top-3 z-10 w-[min(24rem,92%)]">
+        <div className="pointer-events-auto absolute right-3 top-3 z-10 max-h-[calc(100%-24px)] w-[min(20rem,90%)] overflow-y-auto">
           {popup}
         </div>
       ) : null}
