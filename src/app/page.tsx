@@ -10,8 +10,8 @@ export default function Home() {
     <main className="grid min-h-[calc(100vh-3rem)] place-items-center">
       <div className="w-full max-w-5xl space-y-6">
         <Badge tone="accent">Offline Demo Ready</Badge>
-        <section className="grid gap-6 lg:grid-cols-[1.25fr,1fr]">
-          <Card className="p-6" title="KG Study Tool" subtitle="From scattered PDFs to connected knowledge.">
+        <section className="grid min-w-0 gap-6 lg:grid-cols-[1.25fr,1fr]">
+          <Card className="min-w-0 p-6" title="KG Study Tool" subtitle="From scattered PDFs to connected knowledge.">
             <p className="text-sm text-[var(--color-text-muted)]">
               Upload class materials, extract a concept graph, then explore relationships with confidence and source context.
               The app is designed to run fully offline for demo reliability.
@@ -25,7 +25,7 @@ export default function Home() {
               </Link>
             </div>
           </Card>
-          <Card title="Live Preview" subtitle="Connected learning structure at a glance">
+          <Card className="min-w-0" title="Live Preview" subtitle="Connected learning structure at a glance">
             <LandingGraphPreview />
           </Card>
         </section>

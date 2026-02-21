@@ -21,6 +21,10 @@
   --color-danger-strong: #8a2323;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 @theme inline {
   --color-background: var(--color-bg);
   --color-foreground: var(--color-text);

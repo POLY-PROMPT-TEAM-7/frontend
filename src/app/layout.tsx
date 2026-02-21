@@ -19,8 +19,8 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen antialiased">
         <div className="relative min-h-screen">
-          <div className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 lg:px-8">
-            <header className="mb-4 flex items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+          <div className="mx-auto w-full min-w-0 max-w-[1200px] px-4 py-6 sm:px-6 lg:max-w-[1400px] lg:px-8 2xl:max-w-[1600px]">
+            <header className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
               <Link href="/" className="text-sm font-semibold text-[var(--color-text)]">
                 KG Study Tool
               </Link>

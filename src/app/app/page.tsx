@@ -319,7 +319,7 @@ export default function AppPage() {
         </div>
       </header>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)]">
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,240px)_minmax(0,4fr)_minmax(0,220px)] 2xl:grid-cols-[minmax(0,260px)_minmax(0,4.8fr)_minmax(0,240px)]">
         <div className="min-w-0 space-y-4">
           <UploadDropzone />
           <FileList />

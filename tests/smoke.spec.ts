@@ -27,6 +27,18 @@ test("about page and landing route are available", async ({ page }) => {
   await expect(page.getByText("Responsible Use")).toBeVisible();
 });
 
+test("home page does not overflow horizontally", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+
+  const hasHorizontalOverflow = await page.evaluate(() => {
+    return document.documentElement.scrollWidth > window.innerWidth + 1;
+  });
+
+  expect(hasHorizontalOverflow).toBeFalsy();
+});
+
 test("mobile layout stays within viewport and core controls remain visible", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/app");
@@ -40,4 +52,18 @@ test("mobile layout stays within viewport and core controls remain visible", asy
   });
 
   expect(hasHorizontalOverflow).toBeFalsy();
+});
+
+test("graph canvas is wider than right rail on desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 1400, height: 900 });
+  await page.goto("/app");
+  await page.getByTestId("load-demo-btn").click();
+
+  const graphBox = await page.getByTestId("graph-canvas").boundingBox();
+  const detailsBox = await page.getByTestId("details-panel").boundingBox();
+
+  expect(graphBox && detailsBox).toBeTruthy();
+  if (!graphBox || !detailsBox) return;
+
+  expect(graphBox.width).toBeGreaterThan(detailsBox.width);
 });
